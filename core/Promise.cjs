@@ -116,38 +116,12 @@ class _Promise {
         resolve(x);
     }
 
-    createResolveCallback(promise2, onFulfilled, resolve, reject) {
-        return (value) => queueMicrotask(() => {
-            if (typeof onFulfilled !== 'function') {
-                resolve(value);
-                return;
-            }
-
+    wrapCallback(promise2, callback, resolve, reject) {
+        return (arg) => queueMicrotask(() => {
             let x;
 
             try {
-                x = onFulfilled(value);
-            } catch (error) {
-                reject(error);
-                return;
-            }
-
-            this.resolutionProcedure(promise2, x, resolve, reject)
-        })
-        
-    }
-
-    createRejectCallback(promise2, onRejected, resolve, reject) {
-        return (reason) => queueMicrotask(() => {
-            if (typeof onRejected !== 'function') {
-                reject(reason);
-                return;
-            }
-
-            let x;
-
-            try {
-                x = onRejected(reason);
+                x = callback(arg);
             } catch (error) {
                 reject(error);
                 return;
@@ -159,13 +133,13 @@ class _Promise {
     }
 
     then(onFulfilled, onRejected) {
-        const promise2 = new _Promise((resolve, reject) => {
+        const p2 = new _Promise((resolve, reject) => {
             queueMicrotask(() => {
                 onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : () => resolve(this.value);
                 onRejected = typeof onRejected === 'function' ? onRejected : () => reject(this.reason);
 
-                const resolveCallback = this.createResolveCallback(promise2, onFulfilled, resolve, reject);
-                const rejectCallback = this.createRejectCallback(promise2, onRejected, resolve, reject);
+                const resolveCallback = this.wrapCallback(p2, onFulfilled, resolve, reject);
+                const rejectCallback = this.wrapCallback(p2, onRejected, resolve, reject);
 
                 if (this.state === PromiseState.fulfilled) {
                     resolveCallback(this.value);
@@ -187,7 +161,7 @@ class _Promise {
             })
         })
 
-        return promise2;
+        return p2;
     }
 }
 
