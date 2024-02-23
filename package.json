@@ -1,0 +1,17 @@
+{
+  "name": "promise-aplus",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Promise.js",
+  "type": "module",
+  "scripts": {
+    "test": "promises-aplus-tests ./core/Promise.cjs",
+    "test1": "promises-aplus-tests ./work1/Promise_v2.cjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "promises-aplus-tests": "^2.1.2"
+  }
+}
